@@ -1,0 +1,11 @@
+ - name: Setup cleanup jobs
+   hosts: 
+        - master
+        - nodes
+   tasks:
+    - cron:
+        name: "Docker system prune"
+        minute: "0"
+        hour: "0"
+        job: "/bin/docker system prune --force && /bin/docker image prine -f -a"
+
