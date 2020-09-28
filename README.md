@@ -86,3 +86,23 @@ and then run `start.sh` to start the provisioning. Once the ssh is connected to 
 script will atatch to the `tmux` session running Ansible installer.
 
 To destroy the infrastructure, run the `stop.sh` script.
+
+## Updating Let's Encrypt certificate
+
+Sadly, the Let'Encrypt certificate renewal process is manual. One of the reasons is that our domain provider don't support auto-upadte of TXT records via Let's Encrypt. 
+To update the certificate:
+
+ssh into server described in `inventory.ini`
+
+```
+sudo -s 
+cd ~/DA-installcentos
+export domain=datest.no
+certbot certonly --manual --preferred-challenges dns --email andreas.mosti@bekk.no --server https://acme-v02.api.letsencrypt.org/directory --agree-tos -d $DOMAIN -d *.$DOMAIN -d *.apps.$DOMAIN
+
+# Certbot will list out DNS txt records  for challanges. Update these in https://www.uniweb.no/panel/, details in keepass.
+
+ansible-playbook -i inventory.ini openshift-ansible/playbooks/redeploy-certificates.yml
+```
+The redeployment of the certificates and the restarting of the cluster will take some time.
+
